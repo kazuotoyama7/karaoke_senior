@@ -429,6 +429,43 @@
             border-radius: 10px;
         }
 
+        /* 固定の再生ボタン（右下） */
+        .floating-play-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            z-index: 999;
+            display: none;
+            transition: all 0.3s;
+        }
+
+        .floating-play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+
+        .floating-play-btn.show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .floating-play-btn .count {
+            background: rgba(255,255,255,0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 36px;
@@ -453,6 +490,13 @@
 
             .youtube-song-artist {
                 font-size: 16px;
+            }
+
+            .floating-play-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 18px;
             }
         }
     </style>
@@ -506,6 +550,11 @@
             <div id="song-list" class="song-grid"></div>
         </div>
     </div>
+
+    <!-- 固定の再生ボタン -->
+    <button id="floating-play-btn" class="floating-play-btn" onclick="playQueue()">
+        ▶ 再生 <span class="count" id="floating-count">0曲</span>
+    </button>
 
     <script>
         // 予約リスト
@@ -774,9 +823,12 @@
         function updateQueueDisplay() {
             const section = document.getElementById('queue-section');
             const list = document.getElementById('queue-list');
+            const floatingBtn = document.getElementById('floating-play-btn');
+            const floatingCount = document.getElementById('floating-count');
 
             if (queue.length === 0) {
                 section.classList.remove('has-songs');
+                floatingBtn.classList.remove('show');
                 return;
             }
 
@@ -788,6 +840,10 @@
                     <button class="remove-btn" onclick="removeFromQueue(${song.id})">×</button>
                 </div>
             `).join('');
+
+            // 固定ボタンを表示
+            floatingBtn.classList.add('show');
+            floatingCount.textContent = `${queue.length}曲`;
         }
 
         // 検索結果取得
