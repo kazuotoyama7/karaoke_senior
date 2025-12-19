@@ -63,11 +63,48 @@
             display: block;
         }
 
+        .queue-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
         .queue-title {
             font-size: 28px;
             font-weight: bold;
             color: #856404;
-            margin-bottom: 15px;
+        }
+
+        .play-queue-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .play-queue-btn:hover {
+            background: #218838;
+        }
+
+        .clear-queue-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .clear-queue-btn:hover {
+            background: #c82333;
         }
 
         .queue-list {
@@ -240,6 +277,51 @@
             font-size: 16px;
         }
 
+        .song-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .play-now-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .play-now-btn:hover {
+            background: #218838;
+        }
+
+        .add-to-queue-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .add-to-queue-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .add-to-queue-btn.in-queue {
+            background: #ffc107;
+            color: #856404;
+            border-color: #ffc107;
+        }
+
         .play-text {
             margin-top: 12px;
             font-size: 18px;
@@ -296,6 +378,22 @@
         .youtube-song-artist {
             font-size: 20px;
             opacity: 0.9;
+        }
+
+        .next-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .next-btn:hover {
+            background: #218838;
         }
 
         .back-btn {
@@ -367,6 +465,7 @@
                 <div class="youtube-song-title" id="playing-title">曲名</div>
                 <div class="youtube-song-artist" id="playing-artist">アーティスト</div>
             </div>
+            <button id="next-btn" class="next-btn" onclick="playNextSong()" style="display:none;">次の曲 →</button>
             <button class="back-btn" onclick="goBack()">← 曲リストに戻る</button>
         </div>
         <div class="youtube-container">
@@ -381,6 +480,16 @@
         <div class="header">
             <h1>🎤 かんたんカラオケ</h1>
             <p>曲をタップで再生！（150曲収録）</p>
+        </div>
+
+        <!-- 予約リスト表示エリア -->
+        <div id="queue-section" class="queue-section">
+            <div class="queue-header">
+                <div class="queue-title">🎵 予約リスト</div>
+                <button class="play-queue-btn" onclick="playQueue()">▶ 予約曲を再生</button>
+                <button class="clear-queue-btn" onclick="clearQueue()">🗑 全削除</button>
+            </div>
+            <div id="queue-list" class="queue-list"></div>
         </div>
 
         <div class="search-box">
@@ -399,6 +508,11 @@
     </div>
 
     <script>
+        // 予約リスト
+        let queue = [];
+        let isPlayingQueue = false;
+        let currentQueueIndex = 0;
+
         // 曲データベース（150曲）
         const songs = [
             {id: 1, title: '北国の春', artist: '千昌夫', category: '演歌', youtubeId: 'wf1eSqjz3JQ'},
@@ -578,13 +692,22 @@
             }
 
             container.innerHTML = songList.map(song => {
+                const inQueue = queue.some(q => q.id === song.id);
                 return `
-                    <div class="song-card" onclick="playSong(${song.id})">
+                    <div class="song-card ${inQueue ? 'in-queue' : ''}">
+                        <button class="add-queue-btn ${inQueue ? 'in-queue' : ''}" onclick="event.stopPropagation(); toggleQueue(${song.id})">
+                            ${inQueue ? '✓' : '+'}
+                        </button>
                         <div class="song-number">No.${song.id}</div>
                         <div class="song-category">${song.category}</div>
                         <div class="song-title">${song.title}</div>
                         <div class="song-artist">${song.artist}</div>
-                        <div class="play-text">▶ タップで再生</div>
+                        <div class="song-buttons">
+                            <button class="play-now-btn" onclick="playSong(${song.id})">▶ 今すぐ再生</button>
+                            <button class="add-to-queue-btn ${inQueue ? 'in-queue' : ''}" onclick="toggleQueue(${song.id})">
+                                ${inQueue ? '✓ 予約済み' : '+ 予約する'}
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -595,9 +718,14 @@
             const song = songs.find(s => s.id === songId);
             if (!song) return;
 
+            isPlayingQueue = false;
+
             // 曲情報を表示
             document.getElementById('playing-title').textContent = song.title;
             document.getElementById('playing-artist').textContent = song.artist;
+
+            // 次の曲ボタンを非表示
+            document.getElementById('next-btn').style.display = 'none';
 
             // YouTube埋め込み
             document.getElementById('youtube-iframe').src =
@@ -611,6 +739,120 @@
         function goBack() {
             document.getElementById('youtube-screen').classList.remove('active');
             document.getElementById('youtube-iframe').src = '';
+            isPlayingQueue = false;
+        }
+
+        // 予約リストに追加/削除
+        function toggleQueue(songId) {
+            const song = songs.find(s => s.id === songId);
+            if (!song) return;
+
+            const index = queue.findIndex(q => q.id === songId);
+            if (index === -1) {
+                queue.push(song);
+            } else {
+                queue.splice(index, 1);
+            }
+            updateQueueDisplay();
+            renderSongList(getFilteredSongs());
+        }
+
+        // 予約リストから削除
+        function removeFromQueue(songId) {
+            queue = queue.filter(q => q.id !== songId);
+            updateQueueDisplay();
+            renderSongList(getFilteredSongs());
+        }
+
+        // 予約リスト全削除
+        function clearQueue() {
+            queue = [];
+            updateQueueDisplay();
+            renderSongList(getFilteredSongs());
+        }
+
+        // 予約リスト表示更新
+        function updateQueueDisplay() {
+            const section = document.getElementById('queue-section');
+            const list = document.getElementById('queue-list');
+
+            if (queue.length === 0) {
+                section.classList.remove('has-songs');
+                return;
+            }
+
+            section.classList.add('has-songs');
+            list.innerHTML = queue.map((song, index) => `
+                <div class="queue-item">
+                    <span class="queue-number">${index + 1}</span>
+                    <span>${song.title} - ${song.artist}</span>
+                    <button class="remove-btn" onclick="removeFromQueue(${song.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // 検索結果取得
+        function getFilteredSongs() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            if (!searchTerm) return songs;
+            return songs.filter(song =>
+                song.title.toLowerCase().includes(searchTerm) ||
+                song.artist.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        // 予約曲を順番に再生
+        function playQueue() {
+            if (queue.length === 0) {
+                alert('予約リストが空です');
+                return;
+            }
+            isPlayingQueue = true;
+            currentQueueIndex = 0;
+            playQueueSong(currentQueueIndex);
+        }
+
+        // 予約リストの曲を再生
+        function playQueueSong(index) {
+            if (index >= queue.length) {
+                // 全曲再生完了
+                isPlayingQueue = false;
+                document.getElementById('next-btn').style.display = 'none';
+                goBack();
+                alert('予約リストの全曲を再生しました！');
+                return;
+            }
+
+            const song = queue[index];
+            currentQueueIndex = index;
+
+            // 曲情報を表示
+            document.getElementById('playing-title').textContent = `[${index + 1}/${queue.length}] ${song.title}`;
+            document.getElementById('playing-artist').textContent = song.artist;
+
+            // 次の曲ボタンを表示（最後の曲以外）
+            const nextBtn = document.getElementById('next-btn');
+            if (index < queue.length - 1) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = `次の曲 → (${queue[index + 1].title})`;
+            } else {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = '再生終了 →';
+            }
+
+            // YouTube埋め込み
+            document.getElementById('youtube-iframe').src =
+                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0`;
+
+            // 再生画面を表示
+            document.getElementById('youtube-screen').classList.add('active');
+        }
+
+        // 次の曲へ（手動）
+        function playNextSong() {
+            if (!isPlayingQueue) return;
+            currentQueueIndex++;
+            playQueueSong(currentQueueIndex);
         }
 
         // 初期化実行
