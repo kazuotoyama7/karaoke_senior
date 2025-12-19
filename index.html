@@ -511,7 +511,6 @@
         // 予約リスト
         let queue = [];
         let isPlayingQueue = false;
-        let currentQueueIndex = 0;
 
         // 曲データベース（150曲）
         const songs = [
@@ -808,13 +807,12 @@
                 return;
             }
             isPlayingQueue = true;
-            currentQueueIndex = 0;
-            playQueueSong(currentQueueIndex);
+            playQueueSong();
         }
 
         // 予約リストの曲を再生
-        function playQueueSong(index) {
-            if (index >= queue.length) {
+        function playQueueSong() {
+            if (queue.length === 0) {
                 // 全曲再生完了
                 isPlayingQueue = false;
                 document.getElementById('next-btn').style.display = 'none';
@@ -823,18 +821,18 @@
                 return;
             }
 
-            const song = queue[index];
-            currentQueueIndex = index;
+            // 常に先頭の曲を再生
+            const song = queue[0];
 
-            // 曲情報を表示
-            document.getElementById('playing-title').textContent = `[${index + 1}/${queue.length}] ${song.title}`;
+            // 曲情報を表示（残り曲数を表示）
+            document.getElementById('playing-title').textContent = `${song.title}（残り${queue.length}曲）`;
             document.getElementById('playing-artist').textContent = song.artist;
 
-            // 次の曲ボタンを表示（最後の曲以外）
+            // 次の曲ボタンを表示
             const nextBtn = document.getElementById('next-btn');
-            if (index < queue.length - 1) {
+            if (queue.length > 1) {
                 nextBtn.style.display = 'block';
-                nextBtn.textContent = `次の曲 → (${queue[index + 1].title})`;
+                nextBtn.textContent = `次の曲 → (${queue[1].title})`;
             } else {
                 nextBtn.style.display = 'block';
                 nextBtn.textContent = '再生終了 →';
@@ -851,8 +849,14 @@
         // 次の曲へ（手動）
         function playNextSong() {
             if (!isPlayingQueue) return;
-            currentQueueIndex++;
-            playQueueSong(currentQueueIndex);
+
+            // 再生した曲を予約リストから削除
+            queue.shift();  // 先頭の曲を削除
+            updateQueueDisplay();  // 予約リスト表示を更新
+            renderSongList(getFilteredSongs());  // 曲一覧の表示も更新
+
+            // 次の曲を再生
+            playQueueSong();
         }
 
         // 初期化実行
