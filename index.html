@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>かんたんカラオケ 150曲版</title>
-    <meta name="description" content="高齢者向けかんたんカラオケアプリ 150曲収録">
+    <title>かんたんカラオケ 200曲版</title>
+    <meta name="description" content="高齢者向けかんたんカラオケアプリ 200曲収録">
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -165,47 +165,6 @@
 
         .search-input:focus {
             border-color: #f5576c;
-        }
-
-        /* あいうえおフィルター */
-        .aiueo-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-
-        .aiueo-btn {
-            width: 50px;
-            height: 50px;
-            border: none;
-            border-radius: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            background: #667eea;
-            color: white;
-            transition: all 0.2s;
-        }
-
-        .aiueo-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .aiueo-btn.active {
-            background: #f5576c;
-            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
-        }
-
-        .aiueo-btn.all {
-            width: auto;
-            padding: 0 20px;
-            background: #28a745;
-        }
-
-        .aiueo-btn.all.active {
-            background: #f5576c;
         }
 
         .content {
@@ -470,43 +429,6 @@
             border-radius: 10px;
         }
 
-        /* 固定の再生ボタン（右下） */
-        .floating-play-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-            z-index: 999;
-            display: none;
-            transition: all 0.3s;
-        }
-
-        .floating-play-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
-        }
-
-        .floating-play-btn.show {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .floating-play-btn .count {
-            background: rgba(255,255,255,0.3);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 16px;
-        }
-
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 36px;
@@ -531,13 +453,6 @@
 
             .youtube-song-artist {
                 font-size: 16px;
-            }
-
-            .floating-play-btn {
-                bottom: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                font-size: 18px;
             }
         }
     </style>
@@ -564,7 +479,7 @@
     <div class="container">
         <div class="header">
             <h1>🎤 かんたんカラオケ</h1>
-            <p>曲をタップで再生！（150曲収録）</p>
+            <p>曲をタップで再生！（200曲収録）</p>
         </div>
 
         <!-- 予約リスト表示エリア -->
@@ -585,19 +500,6 @@
                 placeholder="🔍 曲名・歌手名で検索..."
                 oninput="searchSongs()"
             >
-            <div class="aiueo-filter">
-                <button class="aiueo-btn all active" onclick="filterByAiueo('')">全曲</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('あ')">あ</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('か')">か</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('さ')">さ</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('た')">た</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('な')">な</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('は')">は</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('ま')">ま</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('や')">や</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('ら')">ら</button>
-                <button class="aiueo-btn" onclick="filterByAiueo('わ')">わ</button>
-            </div>
         </div>
 
         <div class="content">
@@ -605,32 +507,13 @@
         </div>
     </div>
 
-    <!-- 固定の再生ボタン -->
-    <button id="floating-play-btn" class="floating-play-btn" onclick="playQueue()">
-        ▶ 再生 <span class="count" id="floating-count">0曲</span>
-    </button>
-
     <script>
         // 予約リスト
         let queue = [];
         let isPlayingQueue = false;
-        let currentAiueoFilter = '';  // あいうえおフィルター
+        let currentQueueIndex = 0;
 
-        // あいうえお行の定義
-        const aiueoRows = {
-            'あ': ['あ', 'い', 'う', 'え', 'お', 'ア', 'イ', 'ウ', 'エ', 'オ'],
-            'か': ['か', 'き', 'く', 'け', 'こ', 'が', 'ぎ', 'ぐ', 'げ', 'ご', 'カ', 'キ', 'ク', 'ケ', 'コ', 'ガ', 'ギ', 'グ', 'ゲ', 'ゴ'],
-            'さ': ['さ', 'し', 'す', 'せ', 'そ', 'ざ', 'じ', 'ず', 'ぜ', 'ぞ', 'サ', 'シ', 'ス', 'セ', 'ソ', 'ザ', 'ジ', 'ズ', 'ゼ', 'ゾ'],
-            'た': ['た', 'ち', 'つ', 'て', 'と', 'だ', 'ぢ', 'づ', 'で', 'ど', 'タ', 'チ', 'ツ', 'テ', 'ト', 'ダ', 'ヂ', 'ヅ', 'デ', 'ド'],
-            'な': ['な', 'に', 'ぬ', 'ね', 'の', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ'],
-            'は': ['は', 'ひ', 'ふ', 'へ', 'ほ', 'ば', 'び', 'ぶ', 'べ', 'ぼ', 'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ', 'バ', 'ビ', 'ブ', 'ベ', 'ボ', 'パ', 'ピ', 'プ', 'ペ', 'ポ'],
-            'ま': ['ま', 'み', 'む', 'め', 'も', 'マ', 'ミ', 'ム', 'メ', 'モ'],
-            'や': ['や', 'ゆ', 'よ', 'ヤ', 'ユ', 'ヨ'],
-            'ら': ['ら', 'り', 'る', 'れ', 'ろ', 'ラ', 'リ', 'ル', 'レ', 'ロ'],
-            'わ': ['わ', 'を', 'ん', 'ワ', 'ヲ', 'ン']
-        };
-
-        // 曲データベース（150曲）
+        // 曲データベース（200曲）
         const songs = [
             {id: 1, title: '北国の春', artist: '千昌夫', category: '演歌', youtubeId: 'wf1eSqjz3JQ'},
             {id: 2, title: '津軽海峡冬景色', artist: '石川さゆり', category: '演歌', youtubeId: '5NbL8sOdq6A'},
@@ -682,61 +565,61 @@
             {id: 48, title: '恋桜', artist: '坂本冬美', category: '演歌', youtubeId: 'NTE8x_K4HF8'},
             {id: 49, title: 'さざんかの宿', artist: '大川栄策', category: '演歌', youtubeId: 'MWrnnJW-I20'},
             {id: 50, title: '柳ヶ瀬ブルース', artist: '美川憲一', category: '演歌', youtubeId: 'lbt6XlHCLug'},
-            {id: 51, title: '立待岬', artist: '森昌子', category: '演歌', youtubeId: '1EYxT4ZBQx8'},
-            {id: 52, title: '夫婦坂', artist: '都はるみ', category: '演歌', youtubeId: '3J2BOpb-Nbc'},
-            {id: 53, title: '涙の連絡船', artist: '都はるみ', category: '演歌', youtubeId: 'tjzo8cdiOWE'},
-            {id: 54, title: '大阪ラプソディー', artist: '海原千里・万里', category: '昭和歌謡', youtubeId: 'Z0QTyZrt1vA'},
-            {id: 55, title: '大阪の女', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: 'lfPDezIzDsM'},
-            {id: 56, title: '能登半島', artist: '石川さゆり', category: '演歌', youtubeId: 'fgJBdOuAYwA'},
-            {id: 57, title: 'わかれ雪', artist: '石川さゆり', category: '演歌', youtubeId: 'M4X6gN3j37s'},
-            {id: 58, title: 'くちなしの花', artist: '渡哲也', category: '演歌', youtubeId: 'Zc5lu8t0oHk'},
-            {id: 59, title: '夜のプラットホーム', artist: '八代亜紀', category: '演歌', youtubeId: '8sHA0DxNCLw'},
-            {id: 60, title: '恋歌', artist: '八代亜紀', category: '演歌', youtubeId: 's_Z2oGkwOsQ'},
-            {id: 61, title: '愛の終着駅', artist: '八代亜紀', category: '演歌', youtubeId: '0rm12TqcjXM'},
-            {id: 62, title: 'なみだ恋', artist: '八代亜紀', category: '演歌', youtubeId: 'l8ysiFEFyeg'},
-            {id: 63, title: '暖簾', artist: '都はるみ・五木ひろし', category: '演歌', youtubeId: 'UaeqsF1tkrw'},
-            {id: 64, title: 'ふたり酒', artist: '川中美幸', category: '演歌', youtubeId: 'KHl4yos3s4g'},
-            {id: 65, title: 'ふたり花', artist: '川中美幸', category: '演歌', youtubeId: 'uvE7GZAXr8Q'},
-            {id: 66, title: '二輪草', artist: '川中美幸', category: '演歌', youtubeId: 'DDF6PS7ij0o'},
-            {id: 67, title: '狙いうち', artist: '山本リンダ', category: '昭和歌謡', youtubeId: 'Yy5RuW2KIqI'},
-            {id: 68, title: 'どうにもとまらない', artist: '山本リンダ', category: '昭和歌謡', youtubeId: 'Q14kUWjj0pA'},
-            {id: 69, title: '魅せられて', artist: 'ジュディ・オング', category: '昭和歌謡', youtubeId: 'b8gd9VD3C0I'},
-            {id: 70, title: '愛人', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: '3eQlxqL5h5c'},
-            {id: 71, title: '別れの予感', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'fDp_VF-diBI'},
-            {id: 72, title: '空港', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'vv_UyY5xGyI'},
-            {id: 73, title: '雨夜の月', artist: '八代亜紀', category: '演歌', youtubeId: 'FqhkQHZPAG4'},
-            {id: 74, title: '雨の御堂筋', artist: '欧陽菲菲', category: '昭和歌謡', youtubeId: 'nfjUAByFnPs'},
-            {id: 75, title: 'ラヴ・イズ・オーヴァー', artist: '欧陽菲菲', category: '昭和歌謡', youtubeId: '2j2EuWA7n9w'},
-            {id: 76, title: '圭子の夢は夜ひらく', artist: '藤圭子', category: '演歌', youtubeId: 'VV_yBTh4B2w'},
-            {id: 77, title: '新宿の女', artist: '藤圭子', category: '演歌', youtubeId: '5MyCq_7u0bo'},
-            {id: 78, title: '女のブルース', artist: '藤圭子', category: '演歌', youtubeId: 'YJyBkoqor0E'},
-            {id: 79, title: '真赤な太陽', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'o6EU95q_0vU'},
-            {id: 80, title: '柔', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'Zc77hZQ-Fik'},
-            {id: 81, title: '一本の鉛筆', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'LrsAxSdOmzE'},
-            {id: 82, title: '船頭小唄', artist: '藤圭子', category: '演歌', youtubeId: '1gPxn5dsX_Q'},
-            {id: 83, title: '恋の季節', artist: 'ピンキーとキラーズ', category: '昭和歌謡', youtubeId: 'KkO4vx8sA-o'},
-            {id: 84, title: '長崎の女', artist: '春日八郎', category: '演歌', youtubeId: 'ifvSDp4Cw2M'},
-            {id: 85, title: '女の意地', artist: '西田佐知子', category: '昭和歌謡', youtubeId: 'ir39MpWkVbc'},
-            {id: 86, title: 'アカシアの雨がやむ時', artist: '西田佐知子', category: '昭和歌謡', youtubeId: 'bKAd8dZsRLk'},
-            {id: 87, title: 'ウナ・セラ・ディ東京', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: '5mDTDAqbYM8'},
-            {id: 88, title: '恋のバカンス', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: 'uFUEr_eWVlg'},
-            {id: 89, title: '恋のフーガ', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: 'xE02U5FUKjw'},
-            {id: 90, title: 'フランシーヌの場合', artist: '新谷のり子', category: '昭和歌謡', youtubeId: 'xPxDfKE0zAQ'},
-            {id: 91, title: 'あなた', artist: '小坂明子', category: '昭和歌謡', youtubeId: '3bdwdCAQOE8'},
-            {id: 92, title: '手紙', artist: '由紀さおり', category: '昭和歌謡', youtubeId: 'Jplc09pjl7A'},
-            {id: 93, title: '夜明けのスキャット', artist: '由紀さおり', category: '昭和歌謡', youtubeId: 'h4kgj4mqi1g'},
-            {id: 94, title: '秋桜', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'XiCE6bTyxUk'},
-            {id: 95, title: 'いい日旅立ち', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'r6SlbNWIrdw'},
-            {id: 96, title: 'セカンド・ラブ', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'n05Axu4cK3E'},
-            {id: 97, title: '北ウイング', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'O3GWVnqe0pQ'},
-            {id: 98, title: '別れても好きな人', artist: 'ロス・インディオス＆シルヴィア', category: '昭和歌謡', youtubeId: '2MawK8Tn0ks'},
-            {id: 99, title: '愛が生まれた日', artist: '藤谷美和子・大内義昭', category: '昭和歌謡', youtubeId: 'AmpOC-L9JQ4'},
-            {id: 100, title: '泣かせて', artist: '研ナオコ', category: '昭和歌謡', youtubeId: 'dMRi-Loew0E'},
-            {id: 101, title: 'あばよ', artist: '研ナオコ', category: '昭和歌謡', youtubeId: '-pQJhMyt8ro'},
-            {id: 102, title: '夏をあきらめて', artist: '研ナオコ', category: '昭和歌謡', youtubeId: 'QWpxxdByJ_Q'},
-            {id: 103, title: 'ミ・アモーレ', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'K4FOfZxUn6E'},
-            {id: 104, title: 'DESIRE', artist: '中森明菜', category: '昭和歌謡', youtubeId: '8lANxB-ug0c'},
-            {id: 105, title: '天使の誘惑', artist: '黛ジュン', category: '昭和歌謡', youtubeId: 'q1BF3hU6-OE'},
+            {id: 51, title: '立待岬', artist: '森昌子', category: '演歌', youtubeId: 'kQoC_ck-Wu0'},
+            {id: 52, title: '夫婦坂', artist: '都はるみ', category: '演歌', youtubeId: 'x0XlN170wxc'},
+            {id: 53, title: '涙の連絡船', artist: '都はるみ', category: '演歌', youtubeId: '016BAjaXl6Q'},
+            {id: 54, title: '大阪ラプソディー', artist: '海原千里・万里', category: '昭和歌謡', youtubeId: 'Cj1i0vYuk_0'},
+            {id: 55, title: '大阪の女', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: '_MiwCueU_QE'},
+            {id: 56, title: '能登半島', artist: '石川さゆり', category: '演歌', youtubeId: 'LJdic_Ot25o'},
+            {id: 57, title: 'わかれ雪', artist: '石川さゆり', category: '演歌', youtubeId: '7hp6amDMJpE'},
+            {id: 58, title: 'くちなしの花', artist: '渡哲也', category: '演歌', youtubeId: 'GLwGVxhSk18'},
+            {id: 59, title: '夜のプラットホーム', artist: '八代亜紀', category: '演歌', youtubeId: 'KGG2XsKcmBE'},
+            {id: 60, title: '恋歌', artist: '八代亜紀', category: '演歌', youtubeId: 'zOgBFk38_gQ'},
+            {id: 61, title: '愛の終着駅', artist: '八代亜紀', category: '演歌', youtubeId: 'KZ52WsNqaD0'},
+            {id: 62, title: 'なみだ恋', artist: '八代亜紀', category: '演歌', youtubeId: 'rLbimbsdlS8'},
+            {id: 63, title: '暖簾', artist: '都はるみ・五木ひろし', category: '演歌', youtubeId: 'lN4S8Dl1ZrE'},
+            {id: 64, title: 'ふたり酒', artist: '川中美幸', category: '演歌', youtubeId: 'jfd2ajoaCWQ'},
+            {id: 65, title: 'ふたり花', artist: '川中美幸', category: '演歌', youtubeId: 'nvrdrKij8FE'},
+            {id: 66, title: '二輪草', artist: '川中美幸', category: '演歌', youtubeId: 'KfbJZemQjjw'},
+            {id: 67, title: '狙いうち', artist: '山本リンダ', category: '昭和歌謡', youtubeId: 'haFq9ToW2yQ'},
+            {id: 68, title: 'どうにもとまらない', artist: '山本リンダ', category: '昭和歌謡', youtubeId: 'W6Y01hYUMWY'},
+            {id: 69, title: '魅せられて', artist: 'ジュディ・オング', category: '昭和歌謡', youtubeId: '_ntL5v2-4Ek'},
+            {id: 70, title: '愛人', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'K6fK1gpQ0Hc'},
+            {id: 71, title: '別れの予感', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'o-c1qm0XCoo'},
+            {id: 72, title: '空港', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'f41--norI8Y'},
+            {id: 73, title: '雨夜の月', artist: '八代亜紀', category: '演歌', youtubeId: 'TMQMi6LPhus'},
+            {id: 74, title: '雨の御堂筋', artist: '欧陽菲菲', category: '昭和歌謡', youtubeId: '-cS_z95wT2s'},
+            {id: 75, title: 'ラヴ・イズ・オーヴァー', artist: '欧陽菲菲', category: '昭和歌謡', youtubeId: 'MwjkSCsDCjA'},
+            {id: 76, title: '圭子の夢は夜ひらく', artist: '藤圭子', category: '演歌', youtubeId: 'y58Utee4HoU'},
+            {id: 77, title: '新宿の女', artist: '藤圭子', category: '演歌', youtubeId: 'I4w0rfj13GE'},
+            {id: 78, title: '女のブルース', artist: '藤圭子', category: '演歌', youtubeId: 'zfhFDXhHt4w'},
+            {id: 79, title: '真赤な太陽', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'm0LZjhxzciQ'},
+            {id: 80, title: '柔', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'lb-F_0VHNAI'},
+            {id: 81, title: '一本の鉛筆', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'XQ9N7P2SoKg'},
+            {id: 82, title: '船頭小唄', artist: '藤圭子', category: '演歌', youtubeId: 'mKrdqWjniq0'},
+            {id: 83, title: '恋の季節', artist: 'ピンキーとキラーズ', category: '昭和歌謡', youtubeId: 'Ny0r_6xHctA'},
+            {id: 84, title: '長崎の女', artist: '春日八郎', category: '演歌', youtubeId: 'XxJcOKTzs6w'},
+            {id: 85, title: '女の意地', artist: '西田佐知子', category: '昭和歌謡', youtubeId: '6y1UBY_kI_s'},
+            {id: 86, title: 'アカシアの雨がやむ時', artist: '西田佐知子', category: '昭和歌謡', youtubeId: 'iRPCmmpi6wU'},
+            {id: 87, title: 'ウナ・セラ・ディ東京', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: '2OhsaWti_W8'},
+            {id: 88, title: '恋のバカンス', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: 'BQEg44CB20c'},
+            {id: 89, title: '恋のフーガ', artist: 'ザ・ピーナッツ', category: '昭和歌謡', youtubeId: 'HuTEqwf5I8E'},
+            {id: 90, title: 'フランシーヌの場合', artist: '新谷のり子', category: '昭和歌謡', youtubeId: 'zLEGNGwoY0U'},
+            {id: 91, title: 'あなた', artist: '小坂明子', category: '昭和歌謡', youtubeId: 'gdNuupDxZLc'},
+            {id: 92, title: '手紙', artist: '由紀さおり', category: '昭和歌謡', youtubeId: 'sZeCgpW8PLU'},
+            {id: 93, title: '夜明けのスキャット', artist: '由紀さおり', category: '昭和歌謡', youtubeId: 'EeT3CMiEcUs'},
+            {id: 94, title: '秋桜', artist: '山口百恵', category: '昭和歌謡', youtubeId: '16PAjUZfnu4'},
+            {id: 95, title: 'いい日旅立ち', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'xMO_Ybit3jM'},
+            {id: 96, title: 'セカンド・ラブ', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'hziC0S1AE0g'},
+            {id: 97, title: '北ウイング', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'nQWyDgCOd8o'},
+            {id: 98, title: '別れても好きな人', artist: 'ロス・インディオス＆シルヴィア', category: '昭和歌謡', youtubeId: '5iW3fPbv-WY'},
+            {id: 99, title: '愛が生まれた日', artist: '藤谷美和子・大内義昭', category: '昭和歌謡', youtubeId: 'df9PAthDbJs'},
+            {id: 100, title: '泣かせて', artist: '研ナオコ', category: '昭和歌謡', youtubeId: 'BDTqp4KLZqk'},
+            {id: 101, title: 'あばよ', artist: '研ナオコ', category: '昭和歌謡', youtubeId: 'knuo3J15JTc'},
+            {id: 102, title: '夏をあきらめて', artist: '研ナオコ', category: '昭和歌謡', youtubeId: 'ptzDyw7QHkw'},
+            {id: 103, title: 'ミ・アモーレ', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'h20Xki8aEMA'},
+            {id: 104, title: 'DESIRE', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'ciqnTEeX-ho'},
+            {id: 105, title: '天使の誘惑', artist: '黛ジュン', category: '昭和歌謡', youtubeId: '6f-TaNxovy8'},
             {id: 106, title: '防人の詩', artist: 'さだまさし', category: 'フォーク', youtubeId: 'HFv9lLs7ZOg'},
             {id: 107, title: '風に立つライオン', artist: 'さだまさし', category: 'フォーク', youtubeId: 'KhNV11MAQn4'},
             {id: 108, title: '心の旅', artist: 'チューリップ', category: 'フォーク', youtubeId: 'hO-IUCP_t74'},
@@ -756,32 +639,82 @@
             {id: 122, title: '明日があるさ', artist: '坂本九', category: '昭和歌謡', youtubeId: 'eiwA31vjjZU'},
             {id: 123, title: '心もよう', artist: '井上陽水', category: 'フォーク', youtubeId: '-FRUlo1qRyA'},
             {id: 124, title: '夢の中へ', artist: '井上陽水', category: 'フォーク', youtubeId: 'yia6fjVT27w'},
-            {id: 125, title: '高校三年生', artist: '舟木一夫', category: '昭和歌謡', youtubeId: 'CBwDBxm9_8g'},
-            {id: 126, title: '瀬戸の花嫁', artist: '小柳ルミ子', category: '昭和歌謡', youtubeId: 'PS3QnlgREPQ'},
-            {id: 127, title: '千の風になって', artist: '秋川雅史', category: '昭和歌謡', youtubeId: 'jRx0iHRH7vc'},
-            {id: 128, title: '氷雨', artist: '佳山明生', category: '演歌', youtubeId: '3VMVxDQW1zY'},
-            {id: 129, title: '夢追い酒', artist: '渥美二郎', category: '演歌', youtubeId: 'qkoAuAYprVA'},
-            {id: 130, title: '青い山脈', artist: '藤山一郎', category: '昭和歌謡', youtubeId: 'R1vkFhvOFyY'},
-            {id: 131, title: 'リンゴの唄', artist: '並木路子', category: '昭和歌謡', youtubeId: '5wG0xTEOn0E'},
-            {id: 132, title: '港町十三番地', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'GFLDcnCsZO4'},
-            {id: 133, title: '人生いろいろ', artist: '島倉千代子', category: '演歌', youtubeId: 'oaPt6seJLFg'},
-            {id: 134, title: 'ブルー・ライト・ヨコハマ', artist: 'いしだあゆみ', category: '昭和歌謡', youtubeId: 'xqgqRI0fjXM'},
-            {id: 135, title: '南国土佐を後にして', artist: 'ペギー葉山', category: '昭和歌謡', youtubeId: 'sMrd02ncmOY'},
-            {id: 136, title: '高原列車は行く', artist: '岡本敦郎', category: '昭和歌謡', youtubeId: 'VsH5NriDB30'},
-            {id: 137, title: '酒と泪と男と女', artist: '河島英五', category: 'フォーク', youtubeId: 'Uxy9Keo_KVc'},
-            {id: 138, title: 'また逢う日まで', artist: '尾崎紀世彦', category: '昭和歌謡', youtubeId: '-4OJ78bZVsA'},
-            {id: 139, title: '街の灯り', artist: '堺正章', category: '昭和歌謡', youtubeId: 'T877gW4jje0'},
-            {id: 140, title: '吾亦紅', artist: 'すぎもとまさと', category: '演歌', youtubeId: 'cs_pCM7Q7Jo'},
-            {id: 141, title: 'アメリカ橋', artist: '山川豊', category: '演歌', youtubeId: '_Ujo6E2WcdI'},
-            {id: 142, title: '北の漁場', artist: '北島三郎', category: '演歌', youtubeId: 'MoMkDh2BXD0'},
-            {id: 143, title: '奥飛騨慕情', artist: '竜鉄也', category: '演歌', youtubeId: 'k8ZBFTOJJ6A'},
-            {id: 144, title: '宗右衛門町ブルース', artist: '平和勝次とダークホース', category: '演歌', youtubeId: 'm1_kQXa2qSY'},
-            {id: 145, title: '古城', artist: '三橋美智也', category: '演歌', youtubeId: '3FtTXdXHeJE'},
-            {id: 146, title: 'つぐない', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'PhAjY67NR9k'},
-            {id: 147, title: '赤いハンカチ', artist: '石原裕次郎', category: '昭和歌謡', youtubeId: 'rx-4AOe55Xw'},
-            {id: 148, title: '好きになった人', artist: '都はるみ', category: '演歌', youtubeId: 'QKmma_bRdQE'},
-            {id: 149, title: 'ワインレッドの心', artist: '安全地帯', category: '昭和歌謡', youtubeId: 'dMRi-Loew0E'},
-            {id: 150, title: '時代おくれ', artist: '河島英五', category: 'フォーク', youtubeId: 'Uxy9Keo_KVc'}
+            {id: 125, title: '高校三年生', artist: '舟木一夫', category: '昭和歌謡', youtubeId: 'tHHodW40X0I'},
+            {id: 126, title: '瀬戸の花嫁', artist: '小柳ルミ子', category: '昭和歌謡', youtubeId: 'tE06fhPctvI'},
+            {id: 127, title: '千の風になって', artist: '秋川雅史', category: '昭和歌謡', youtubeId: 'Pz2VGtZoNzc'},
+            {id: 128, title: '氷雨', artist: '佳山明生', category: '演歌', youtubeId: '7r9faVBJchA'},
+            {id: 129, title: '夢追い酒', artist: '渥美二郎', category: '演歌', youtubeId: 'sEMISmTAK6Q'},
+            {id: 130, title: '青い山脈', artist: '藤山一郎', category: '昭和歌謡', youtubeId: 'nTBcjx0oT7Y'},
+            {id: 131, title: 'リンゴの唄', artist: '並木路子', category: '昭和歌謡', youtubeId: 'fl17ds-fXS0'},
+            {id: 132, title: '港町十三番地', artist: '美空ひばり', category: '昭和歌謡', youtubeId: '0104PTBHBDc'},
+            {id: 133, title: '人生いろいろ', artist: '島倉千代子', category: '演歌', youtubeId: 'CqQCWD2MDT8'},
+            {id: 134, title: 'ブルー・ライト・ヨコハマ', artist: 'いしだあゆみ', category: '昭和歌謡', youtubeId: 'C43eOFGfoz0'},
+            {id: 135, title: '南国土佐を後にして', artist: 'ペギー葉山', category: '昭和歌謡', youtubeId: 'DL9iPurbq0U'},
+            {id: 136, title: '高原列車は行く', artist: '岡本敦郎', category: '昭和歌謡', youtubeId: 'cbBdw2wa2uQ'},
+            {id: 137, title: '酒と泪と男と女', artist: '河島英五', category: 'フォーク', youtubeId: 'SMhk6Zpy1Lo'},
+            {id: 138, title: 'また逢う日まで', artist: '尾崎紀世彦', category: '昭和歌謡', youtubeId: 'QiGfNNYROpU'},
+            {id: 139, title: '街の灯り', artist: '堺正章', category: '昭和歌謡', youtubeId: 'iuvmyw6C1cM'},
+            {id: 140, title: '吾亦紅', artist: 'すぎもとまさと', category: '演歌', youtubeId: 'bPGzyOBwHVg'},
+            {id: 141, title: 'アメリカ橋', artist: '山川豊', category: '演歌', youtubeId: 'QRqG0V4BOQ4'},
+            {id: 142, title: '北の漁場', artist: '北島三郎', category: '演歌', youtubeId: 'vLutv4ATU8Q'},
+            {id: 143, title: '奥飛騨慕情', artist: '竜鉄也', category: '演歌', youtubeId: 'WrrezOP8Dpg'},
+            {id: 144, title: '宗右衛門町ブルース', artist: '平和勝次とダークホース', category: '演歌', youtubeId: 'r8GKLlxrr1c'},
+            {id: 145, title: '古城', artist: '三橋美智也', category: '演歌', youtubeId: 'V-DNyHdXOdY'},
+            {id: 146, title: 'つぐない', artist: 'テレサ・テン', category: '昭和歌謡', youtubeId: 'RjZPlRWlDQI'},
+            {id: 147, title: '赤いハンカチ', artist: '石原裕次郎', category: '昭和歌謡', youtubeId: 'OiaNE2zveOc'},
+            {id: 148, title: '好きになった人', artist: '都はるみ', category: '演歌', youtubeId: 'xA0mNlT6cmA'},
+            {id: 149, title: 'ワインレッドの心', artist: '安全地帯', category: '昭和歌謡', youtubeId: 'PSsehqwvSeA'},
+            {id: 150, title: '時代おくれ', artist: '河島英五', category: 'フォーク', youtubeId: 'IY14vKyuLpA'},
+            {id: 151, title: 'みかんの花咲く丘', artist: '川田正子', category: '童謡', youtubeId: '1alUpEuvAhE'},
+            {id: 152, title: '桜', artist: 'コブクロ', category: 'フォーク', youtubeId: 'Bc1sJN2czbE'},
+            {id: 153, title: 'ハナミズキ', artist: '一青窈', category: 'フォーク', youtubeId: 'Tz9QrntHSD0'},
+            {id: 154, title: '愛のままで…', artist: '秋元順子', category: '演歌', youtubeId: '7X7FNhI9GjE'},
+            {id: 155, title: 'おまえに', artist: 'フランク永井', category: '演歌', youtubeId: 'cH0OuKGnnEc'},
+            {id: 156, title: 'はぐれコキリコ', artist: '成世昌平', category: '演歌', youtubeId: 'onWmH95jBTM'},
+            {id: 157, title: '最北航路', artist: '香西かおり', category: '演歌', youtubeId: 'WKqv0TwYZPE'},
+            {id: 158, title: '紅の舟唄', artist: '北見恭子', category: '演歌', youtubeId: 'iyHgazMyH0w'},
+            {id: 159, title: 'ひとり薩摩路', artist: '水森かおり', category: '演歌', youtubeId: 'Y94B6n71dBY'},
+            {id: 160, title: 'ノラ', artist: '門倉有希', category: '演歌', youtubeId: 'rahj7o8hwDM'},
+            {id: 161, title: '女の港', artist: '大月みやこ', category: '演歌', youtubeId: 'Ooau76HHKao'},
+            {id: 162, title: 'さくら', artist: '森山直太朗', category: 'フォーク', youtubeId: 'eu8VWTI_4Fk'},
+            {id: 163, title: 'ウイスキーが、お好きでしょ', artist: '石川さゆり', category: '昭和歌謡', youtubeId: 'Bxl3mzS_Gfg'},
+            {id: 164, title: 'いつでも夢を', artist: '橋幸夫・吉永小百合', category: '昭和歌謡', youtubeId: 'PuYdMiQ3Oj8'},
+            {id: 165, title: '東京ブギウギ', artist: '笠置シヅ子', category: '昭和歌謡', youtubeId: 'mCPH7Ebdlps'},
+            {id: 166, title: '憧れのハワイ航路', artist: '岡晴夫', category: '昭和歌謡', youtubeId: 'IcCt3MdMEHk'},
+            {id: 167, title: '学生時代', artist: 'ペギー葉山', category: '昭和歌謡', youtubeId: 'D3cZFqRgoiI'},
+            {id: 168, title: '野に咲く花のように', artist: 'ダ・カーポ', category: 'フォーク', youtubeId: '3GaFNlQsuS0'},
+            {id: 169, title: 'いい湯だな', artist: 'ザ・ドリフターズ', category: '昭和歌謡', youtubeId: '8atRKD-ozrc'},
+            {id: 170, title: '幸せなら手をたたこう', artist: '坂本九', category: '昭和歌謡', youtubeId: 'PmHBvucE1lM'},
+            {id: 171, title: 'せんせい', artist: '森昌子', category: '昭和歌謡', youtubeId: 'jo3l7m3txuM'},
+            {id: 172, title: '切手のないおくりもの', artist: '財津和夫', category: 'フォーク', youtubeId: '28ZfvefBdJk'},
+            {id: 173, title: 'ダンシング・ヒーロー', artist: '荻野目洋子', category: '昭和歌謡', youtubeId: '6J222Rod54A'},
+            {id: 174, title: 'UFO', artist: 'ピンク・レディー', category: '昭和歌謡', youtubeId: 'uTVi9qMRDds'},
+            {id: 175, title: 'チャンチキおけさ', artist: '三波春夫', category: '演歌', youtubeId: 'b1OEyVzUWD8'},
+            {id: 176, title: '世界の国からこんにちは', artist: '三波春夫', category: '演歌', youtubeId: 'sDbcC_zONfQ'},
+            {id: 177, title: '月がとっても青いから', artist: '菅原都々子', category: '昭和歌謡', youtubeId: 'vFc2jeRzjqo'},
+            {id: 178, title: '銀座カンカン娘', artist: '高峰秀子', category: '昭和歌謡', youtubeId: 'U5eVIP9WAI4'},
+            {id: 179, title: '昴', artist: '谷村新司', category: 'フォーク', youtubeId: 'WOuCtoie4fY'},
+            {id: 180, title: '冬の稲妻', artist: 'アリス', category: 'フォーク', youtubeId: '9o88yTF4730'},
+            {id: 181, title: 'もしもピアノが弾けたなら', artist: '西田敏行', category: '昭和歌謡', youtubeId: 'np8smCjoxrc'},
+            {id: 182, title: '心凍らせて', artist: '高山厳', category: '昭和歌謡', youtubeId: 'BJmWAwn3rrc'},
+            {id: 183, title: '1円玉の旅がらす', artist: '堺ひろみ', category: '昭和歌謡', youtubeId: 'eYf5EMi5BdU'},
+            {id: 184, title: '世界中の誰よりきっと', artist: '中山美穂', category: '昭和歌謡', youtubeId: 'oSpqXH_lhm0'},
+            {id: 185, title: '星降る街角', artist: '敏いとうとハッピー＆ブルー', category: '昭和歌謡', youtubeId: 'YLU3adJ2bTM'},
+            {id: 186, title: 'お座敷小唄', artist: '松尾和子・和田弘とマヒナスターズ', category: '昭和歌謡', youtubeId: 'g4mc2RPKgFE'},
+            {id: 187, title: '星のフラメンコ', artist: '西郷輝彦', category: '昭和歌謡', youtubeId: 'aCvt7WYMx98'},
+            {id: 188, title: 'お嫁サンバ', artist: '郷ひろみ', category: '昭和歌謡', youtubeId: 'g2pj6VSvUzQ'},
+            {id: 189, title: 'TSUNAMI', artist: 'サザンオールスターズ', category: '昭和歌謡', youtubeId: 'H8MlgZohuhg'},
+            {id: 190, title: 'きよしのズンドコ節', artist: '氷川きよし', category: '演歌', youtubeId: 'WLBQ4Ptzxt8'},
+            {id: 191, title: 'てんとう虫のサンバ', artist: 'チェリッシュ', category: '童謡', youtubeId: 'dv9PRfGHexM'},
+            {id: 192, title: '下町の太陽', artist: '倍賞千恵子', category: '昭和歌謡', youtubeId: '0K-kqQYaLN4'},
+            {id: 193, title: '東京ラプソディ', artist: '藤山一郎', category: '昭和歌謡', youtubeId: 'hF2cORsvnZs'},
+            {id: 194, title: '空に太陽がある限り', artist: '錦野旦', category: '昭和歌謡', youtubeId: 'MOmbaH_8aUw'},
+            {id: 195, title: '僕の贈りもの', artist: 'オフコース', category: 'フォーク', youtubeId: 'HAUNZpDa3fM'},
+            {id: 196, title: '糸', artist: '中島みゆき', category: 'フォーク', youtubeId: 'K8sD3q6lOYE'},
+            {id: 197, title: 'シクラメンのかほり', artist: '布施明', category: '昭和歌謡', youtubeId: 'uE-y869C0cY'},
+            {id: 198, title: 'I LOVE YOU', artist: '尾崎豊', category: '昭和歌謡', youtubeId: 'ABLvFCj05-w'},
+            {id: 199, title: '大空と大地の中で', artist: '松山千春', category: 'フォーク', youtubeId: 'Il76p2sJwcc'},
+            {id: 200, title: 'マツケンサンバⅡ', artist: '松平健', category: '昭和歌謡', youtubeId: 'YwCgA2j-QZQ'}
         ];
 
         // 初期化
@@ -846,7 +779,7 @@
 
             // YouTube埋め込み
             document.getElementById('youtube-iframe').src =
-                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0&playsinline=1`;
+                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0`;
 
             // 再生画面を表示
             document.getElementById('youtube-screen').classList.add('active');
@@ -892,12 +825,9 @@
         function updateQueueDisplay() {
             const section = document.getElementById('queue-section');
             const list = document.getElementById('queue-list');
-            const floatingBtn = document.getElementById('floating-play-btn');
-            const floatingCount = document.getElementById('floating-count');
 
             if (queue.length === 0) {
                 section.classList.remove('has-songs');
-                floatingBtn.classList.remove('show');
                 return;
             }
 
@@ -909,52 +839,16 @@
                     <button class="remove-btn" onclick="removeFromQueue(${song.id})">×</button>
                 </div>
             `).join('');
-
-            // 固定ボタンを表示
-            floatingBtn.classList.add('show');
-            floatingCount.textContent = `${queue.length}曲`;
         }
 
         // 検索結果取得
         function getFilteredSongs() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            let filtered = songs;
-
-            // テキスト検索
-            if (searchTerm) {
-                filtered = filtered.filter(song =>
-                    song.title.toLowerCase().includes(searchTerm) ||
-                    song.artist.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // あいうえおフィルター
-            if (currentAiueoFilter && aiueoRows[currentAiueoFilter]) {
-                const chars = aiueoRows[currentAiueoFilter];
-                filtered = filtered.filter(song => {
-                    const firstChar = song.title.charAt(0);
-                    return chars.includes(firstChar);
-                });
-            }
-
-            return filtered;
-        }
-
-        // あいうえおフィルター
-        function filterByAiueo(row) {
-            currentAiueoFilter = row;
-
-            // ボタンのアクティブ状態を更新
-            document.querySelectorAll('.aiueo-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // 検索欄をクリア
-            document.getElementById('search-input').value = '';
-
-            // リスト更新
-            renderSongList(getFilteredSongs());
+            if (!searchTerm) return songs;
+            return songs.filter(song =>
+                song.title.toLowerCase().includes(searchTerm) ||
+                song.artist.toLowerCase().includes(searchTerm)
+            );
         }
 
         // 予約曲を順番に再生
@@ -964,12 +858,13 @@
                 return;
             }
             isPlayingQueue = true;
-            playQueueSong();
+            currentQueueIndex = 0;
+            playQueueSong(currentQueueIndex);
         }
 
         // 予約リストの曲を再生
-        function playQueueSong() {
-            if (queue.length === 0) {
+        function playQueueSong(index) {
+            if (index >= queue.length) {
                 // 全曲再生完了
                 isPlayingQueue = false;
                 document.getElementById('next-btn').style.display = 'none';
@@ -978,18 +873,18 @@
                 return;
             }
 
-            // 常に先頭の曲を再生
-            const song = queue[0];
+            const song = queue[index];
+            currentQueueIndex = index;
 
-            // 曲情報を表示（残り曲数を表示）
-            document.getElementById('playing-title').textContent = `${song.title}（残り${queue.length}曲）`;
+            // 曲情報を表示
+            document.getElementById('playing-title').textContent = `[${index + 1}/${queue.length}] ${song.title}`;
             document.getElementById('playing-artist').textContent = song.artist;
 
-            // 次の曲ボタンを表示
+            // 次の曲ボタンを表示（最後の曲以外）
             const nextBtn = document.getElementById('next-btn');
-            if (queue.length > 1) {
+            if (index < queue.length - 1) {
                 nextBtn.style.display = 'block';
-                nextBtn.textContent = `次の曲 → (${queue[1].title})`;
+                nextBtn.textContent = `次の曲 → (${queue[index + 1].title})`;
             } else {
                 nextBtn.style.display = 'block';
                 nextBtn.textContent = '再生終了 →';
@@ -997,7 +892,7 @@
 
             // YouTube埋め込み
             document.getElementById('youtube-iframe').src =
-                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0&playsinline=1`;
+                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0`;
 
             // 再生画面を表示
             document.getElementById('youtube-screen').classList.add('active');
@@ -1006,14 +901,8 @@
         // 次の曲へ（手動）
         function playNextSong() {
             if (!isPlayingQueue) return;
-
-            // 再生した曲を予約リストから削除
-            queue.shift();  // 先頭の曲を削除
-            updateQueueDisplay();  // 予約リスト表示を更新
-            renderSongList(getFilteredSongs());  // 曲一覧の表示も更新
-
-            // 次の曲を再生
-            playQueueSong();
+            currentQueueIndex++;
+            playQueueSong(currentQueueIndex);
         }
 
         // 初期化実行
@@ -1022,6 +911,7 @@
         // Service Worker登録
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('SW registered'))
                 .catch(err => console.log('SW registration failed:', err));
         }
     </script>
