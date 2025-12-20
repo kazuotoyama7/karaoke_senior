@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>かんたんカラオケ 150曲版</title>
-    <meta name="description" content="高齢者向けかんたんカラオケアプリ 150曲収録">
+    <title>かんたんカラオケ 200曲版</title>
+    <meta name="description" content="高齢者向けかんたんカラオケアプリ 200曲収録">
     <meta name="theme-color" content="#667eea">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -165,6 +165,47 @@
 
         .search-input:focus {
             border-color: #f5576c;
+        }
+
+        /* あいうえおフィルター */
+        .aiueo-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .aiueo-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .aiueo-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .aiueo-btn.active {
+            background: #f5576c;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+        }
+
+        .aiueo-btn.all {
+            width: auto;
+            padding: 0 20px;
+            background: #28a745;
+        }
+
+        .aiueo-btn.all.active {
+            background: #f5576c;
         }
 
         .content {
@@ -523,7 +564,7 @@
     <div class="container">
         <div class="header">
             <h1>🎤 かんたんカラオケ</h1>
-            <p>曲をタップで再生！（150曲収録）</p>
+            <p>曲をタップで再生！（200曲収録）</p>
         </div>
 
         <!-- 予約リスト表示エリア -->
@@ -544,6 +585,19 @@
                 placeholder="🔍 曲名・歌手名で検索..."
                 oninput="searchSongs()"
             >
+            <div class="aiueo-filter">
+                <button class="aiueo-btn all active" onclick="filterByAiueo('')">全曲</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('あ')">あ</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('か')">か</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('さ')">さ</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('た')">た</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('な')">な</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('は')">は</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('ま')">ま</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('や')">や</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('ら')">ら</button>
+                <button class="aiueo-btn" onclick="filterByAiueo('わ')">わ</button>
+            </div>
         </div>
 
         <div class="content">
@@ -560,6 +614,21 @@
         // 予約リスト
         let queue = [];
         let isPlayingQueue = false;
+        let currentAiueoFilter = '';  // あいうえおフィルター
+
+        // あいうえお行の定義
+        const aiueoRows = {
+            'あ': ['あ', 'い', 'う', 'え', 'お', 'ア', 'イ', 'ウ', 'エ', 'オ'],
+            'か': ['か', 'き', 'く', 'け', 'こ', 'が', 'ぎ', 'ぐ', 'げ', 'ご', 'カ', 'キ', 'ク', 'ケ', 'コ', 'ガ', 'ギ', 'グ', 'ゲ', 'ゴ'],
+            'さ': ['さ', 'し', 'す', 'せ', 'そ', 'ざ', 'じ', 'ず', 'ぜ', 'ぞ', 'サ', 'シ', 'ス', 'セ', 'ソ', 'ザ', 'ジ', 'ズ', 'ゼ', 'ゾ'],
+            'た': ['た', 'ち', 'つ', 'て', 'と', 'だ', 'ぢ', 'づ', 'で', 'ど', 'タ', 'チ', 'ツ', 'テ', 'ト', 'ダ', 'ヂ', 'ヅ', 'デ', 'ド'],
+            'な': ['な', 'に', 'ぬ', 'ね', 'の', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ'],
+            'は': ['は', 'ひ', 'ふ', 'へ', 'ほ', 'ば', 'び', 'ぶ', 'べ', 'ぼ', 'ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ', 'バ', 'ビ', 'ブ', 'ベ', 'ボ', 'パ', 'ピ', 'プ', 'ペ', 'ポ'],
+            'ま': ['ま', 'み', 'む', 'め', 'も', 'マ', 'ミ', 'ム', 'メ', 'モ'],
+            'や': ['や', 'ゆ', 'よ', 'ヤ', 'ユ', 'ヨ'],
+            'ら': ['ら', 'り', 'る', 'れ', 'ろ', 'ラ', 'リ', 'ル', 'レ', 'ロ'],
+            'わ': ['わ', 'を', 'ん', 'ワ', 'ヲ', 'ン']
+        };
 
         // 曲データベース（150曲）
         const songs = [
@@ -712,7 +781,57 @@
             {id: 147, title: '赤いハンカチ', artist: '石原裕次郎', category: '昭和歌謡', youtubeId: 'rx-4AOe55Xw'},
             {id: 148, title: '好きになった人', artist: '都はるみ', category: '演歌', youtubeId: 'QKmma_bRdQE'},
             {id: 149, title: 'ワインレッドの心', artist: '安全地帯', category: '昭和歌謡', youtubeId: 'dMRi-Loew0E'},
-            {id: 150, title: '時代おくれ', artist: '河島英五', category: 'フォーク', youtubeId: 'Uxy9Keo_KVc'}
+            {id: 150, title: '時代おくれ', artist: '河島英五', category: 'フォーク', youtubeId: 'Uxy9Keo_KVc'},
+            {id: 151, title: '異邦人', artist: '久保田早紀', category: '昭和歌謡', youtubeId: 'HVwLPlJp8-c'},
+            {id: 152, title: '桃色吐息', artist: '高橋真梨子', category: '昭和歌謡', youtubeId: 'yrD6P1lk5xM'},
+            {id: 153, title: '夜明けのブルース', artist: '五木ひろし', category: '演歌', youtubeId: 'spzV5WxNiRU'},
+            {id: 154, title: '命くれない', artist: '瀬川瑛子', category: '演歌', youtubeId: 'AKv8mMEgVyk'},
+            {id: 155, title: '望郷じょんから', artist: '細川たかし', category: '演歌', youtubeId: 'VR6JZQyLKi0'},
+            {id: 156, title: '喝采', artist: 'ちあきなおみ', category: '昭和歌謡', youtubeId: 'j5GLbLTdMbM'},
+            {id: 157, title: '赤いスイートピー', artist: '松田聖子', category: '昭和歌謡', youtubeId: 'GpnssiVdXfE'},
+            {id: 158, title: '想い出の渚', artist: 'ザ・ワイルドワンズ', category: '昭和歌謡', youtubeId: 'u8TQwkTB6wA'},
+            {id: 159, title: '星影のワルツ', artist: '千昌夫', category: '演歌', youtubeId: '2eFD2E7FGKU'},
+            {id: 160, title: '釜山港へ帰れ', artist: '渥美二郎', category: '演歌', youtubeId: 'zDXcGm8eLuw'},
+            {id: 161, title: 'お富さん', artist: '春日八郎', category: '演歌', youtubeId: 'PQO2nFpWnAo'},
+            {id: 162, title: 'アンコ椿は恋の花', artist: '都はるみ', category: '演歌', youtubeId: 'zK7ckJm8mOo'},
+            {id: 163, title: 'リンゴ追分', artist: '美空ひばり', category: '昭和歌謡', youtubeId: 'YBVX9i8uOGU'},
+            {id: 164, title: 'また君に恋してる', artist: '坂本冬美', category: '演歌', youtubeId: 'h7i-Y-O4c5Y'},
+            {id: 165, title: '大利根月夜', artist: '田端義夫', category: '演歌', youtubeId: 'bS4n3Y3nXZ8'},
+            {id: 166, title: '銀座の恋の物語', artist: '石原裕次郎・牧村旬子', category: '昭和歌謡', youtubeId: 'L5XHXJ9B0rA'},
+            {id: 167, title: '夜霧よ今夜も有難う', artist: '石原裕次郎', category: '昭和歌謡', youtubeId: 'eFdZjLrKrNg'},
+            {id: 168, title: '二人でお酒を', artist: '梓みちよ', category: '昭和歌謡', youtubeId: 'XK4tN2VyYF8'},
+            {id: 169, title: 'さよならをするために', artist: 'ビリーバンバン', category: 'フォーク', youtubeId: 'TpJX2pCy-YM'},
+            {id: 170, title: '雨やどり', artist: 'さだまさし', category: 'フォーク', youtubeId: 'xIhZNLvFYkE'},
+            {id: 171, title: '精霊流し', artist: 'グレープ', category: 'フォーク', youtubeId: 'h2QVvkZDt_8'},
+            {id: 172, title: '木綿のハンカチーフ', artist: '太田裕美', category: '昭和歌謡', youtubeId: 'KiKqkHdL1Xs'},
+            {id: 173, title: '年下の男の子', artist: 'キャンディーズ', category: '昭和歌謡', youtubeId: 'eLwj4VpHUMc'},
+            {id: 174, title: '春一番', artist: 'キャンディーズ', category: '昭和歌謡', youtubeId: 'k1vFpJqYP5A'},
+            {id: 175, title: 'わたしの彼は左きき', artist: '麻丘めぐみ', category: '昭和歌謡', youtubeId: 'IhdL3Jvqmdc'},
+            {id: 176, title: '17才', artist: '南沙織', category: '昭和歌謡', youtubeId: 'NdWxkLLGq4g'},
+            {id: 177, title: 'ひと夏の経験', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'N4SHXDfZRMk'},
+            {id: 178, title: 'プレイバックPart2', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'HnJ1yZLLDJ4'},
+            {id: 179, title: '横須賀ストーリー', artist: '山口百恵', category: '昭和歌謡', youtubeId: 'mh9v6G3mKBE'},
+            {id: 180, title: '青い珊瑚礁', artist: '松田聖子', category: '昭和歌謡', youtubeId: 'VBx4eVNxIWU'},
+            {id: 181, title: '夏の扉', artist: '松田聖子', category: '昭和歌謡', youtubeId: 'B6S9J1hKlAQ'},
+            {id: 182, title: 'スローモーション', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'rnJLvEY4oZs'},
+            {id: 183, title: '飾りじゃないのよ涙は', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'WfM0zTXkrb0'},
+            {id: 184, title: '難破船', artist: '中森明菜', category: '昭和歌謡', youtubeId: 'lOCKyPLqDG0'},
+            {id: 185, title: 'ルビーの指環', artist: '寺尾聰', category: '昭和歌謡', youtubeId: 'VNSpGqaQVJs'},
+            {id: 186, title: 'さだめ川', artist: 'ちあきなおみ', category: '演歌', youtubeId: 'sDLu8C7cJr0'},
+            {id: 187, title: '黄昏のビギン', artist: 'ちあきなおみ', category: '昭和歌謡', youtubeId: 'Q0WMXR8m2cw'},
+            {id: 188, title: '悲しい色やね', artist: '上田正樹', category: '昭和歌謡', youtubeId: 'Z2j9VNJQbAk'},
+            {id: 189, title: '雪椿', artist: '小林幸子', category: '演歌', youtubeId: 'c4DMvD0DLBY'},
+            {id: 190, title: 'おもいで酒', artist: '小林幸子', category: '演歌', youtubeId: 'mHJFwmxW_O8'},
+            {id: 191, title: '天使のウィンク', artist: '松田聖子', category: '昭和歌謡', youtubeId: 'nG6YfKPfPDM'},
+            {id: 192, title: '勝手にしやがれ', artist: '沢田研二', category: '昭和歌謡', youtubeId: 'RhMpJxG0OJQ'},
+            {id: 193, title: 'TOKIO', artist: '沢田研二', category: '昭和歌謡', youtubeId: 'o0aHY0xvkY0'},
+            {id: 194, title: '愛しき日々', artist: '堀内孝雄', category: 'フォーク', youtubeId: 'qYVP0jFDXd8'},
+            {id: 195, title: '駅', artist: '竹内まりや', category: '昭和歌謡', youtubeId: 'k8wVxjJ2BUw'},
+            {id: 196, title: 'あゝ人生に涙あり', artist: '里見浩太朗・横内正', category: '時代劇', youtubeId: 'jfh-NfQiFmk'},
+            {id: 197, title: '男はつらいよ', artist: '渥美清', category: '映画主題歌', youtubeId: 'LdWqQ1mABEI'},
+            {id: 198, title: 'まちぶせ', artist: '石川ひとみ', category: '昭和歌謡', youtubeId: 'MnLK8d3HuDA'},
+            {id: 199, title: '贈る言葉', artist: '海援隊', category: 'フォーク', youtubeId: 'YT0C3wHnGBU'},
+            {id: 200, title: '乾杯', artist: '長渕剛', category: 'フォーク', youtubeId: 'DybJpECf3I8'}
         ];
 
         // 初期化
@@ -849,11 +968,43 @@
         // 検索結果取得
         function getFilteredSongs() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            if (!searchTerm) return songs;
-            return songs.filter(song =>
-                song.title.toLowerCase().includes(searchTerm) ||
-                song.artist.toLowerCase().includes(searchTerm)
-            );
+            let filtered = songs;
+
+            // テキスト検索
+            if (searchTerm) {
+                filtered = filtered.filter(song =>
+                    song.title.toLowerCase().includes(searchTerm) ||
+                    song.artist.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // あいうえおフィルター
+            if (currentAiueoFilter && aiueoRows[currentAiueoFilter]) {
+                const chars = aiueoRows[currentAiueoFilter];
+                filtered = filtered.filter(song => {
+                    const firstChar = song.title.charAt(0);
+                    return chars.includes(firstChar);
+                });
+            }
+
+            return filtered;
+        }
+
+        // あいうえおフィルター
+        function filterByAiueo(row) {
+            currentAiueoFilter = row;
+
+            // ボタンのアクティブ状態を更新
+            document.querySelectorAll('.aiueo-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 検索欄をクリア
+            document.getElementById('search-input').value = '';
+
+            // リスト更新
+            renderSongList(getFilteredSongs());
         }
 
         // 予約曲を順番に再生
