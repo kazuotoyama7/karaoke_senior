@@ -883,7 +883,11 @@
         // 曲を即再生（画面内でYouTube表示）
         function playSong(songId) {
             const song = songs.find(s => s.id === songId);
-            if (!song) return;
+            if (!song) {
+                alert('曲が見つかりません: ' + songId);
+                return;
+            }
+            console.log('再生:', song.title, song.youtubeId);
 
             isPlayingQueue = false;
 
@@ -896,7 +900,7 @@
 
             // YouTube埋め込み
             document.getElementById('youtube-iframe').src =
-                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0`;
+                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0&playsinline=1`;
 
             // 再生画面を表示
             document.getElementById('youtube-screen').classList.add('active');
@@ -1047,7 +1051,7 @@
 
             // YouTube埋め込み
             document.getElementById('youtube-iframe').src =
-                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0`;
+                `https://www.youtube.com/embed/${song.youtubeId}?autoplay=1&rel=0&playsinline=1`;
 
             // 再生画面を表示
             document.getElementById('youtube-screen').classList.add('active');
@@ -1069,11 +1073,18 @@
         // 初期化実行
         window.addEventListener('DOMContentLoaded', init);
 
-        // Service Worker登録
+        // Service Worker登録（一時的に無効化）
+        // if ('serviceWorker' in navigator) {
+        //     navigator.serviceWorker.register('./sw.js')
+        //         .then(() => console.log('SW registered'))
+        //         .catch(err => console.log('SW registration failed:', err));
+        // }
+
+        // 既存のService Workerを削除
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('SW registered'))
-                .catch(err => console.log('SW registration failed:', err));
+            navigator.serviceWorker.getRegistrations().then(registrations => {
+                registrations.forEach(reg => reg.unregister());
+            });
         }
     </script>
 </body>
