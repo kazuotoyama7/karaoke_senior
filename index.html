@@ -455,6 +455,62 @@
                 font-size: 16px;
             }
         }
+
+        /* フローティング予約再生ボタン */
+        .floating-queue-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 20px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .floating-queue-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.5);
+        }
+
+        .floating-queue-btn.visible {
+            display: flex;
+        }
+
+        .floating-queue-count {
+            background: white;
+            color: #28a745;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .floating-queue-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                font-size: 20px;
+            }
+
+            .floating-queue-count {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -506,6 +562,12 @@
             <div id="song-list" class="song-grid"></div>
         </div>
     </div>
+
+    <!-- フローティング予約再生ボタン -->
+    <button id="floating-queue-btn" class="floating-queue-btn" onclick="playQueue()">
+        ▶ 予約再生
+        <span id="floating-queue-count" class="floating-queue-count">0</span>
+    </button>
 
     <script>
         // 予約リスト
@@ -825,13 +887,18 @@
         function updateQueueDisplay() {
             const section = document.getElementById('queue-section');
             const list = document.getElementById('queue-list');
+            const floatingBtn = document.getElementById('floating-queue-btn');
+            const floatingCount = document.getElementById('floating-queue-count');
 
             if (queue.length === 0) {
                 section.classList.remove('has-songs');
+                floatingBtn.classList.remove('visible');
                 return;
             }
 
             section.classList.add('has-songs');
+            floatingBtn.classList.add('visible');
+            floatingCount.textContent = queue.length;
             list.innerHTML = queue.map((song, index) => `
                 <div class="queue-item">
                     <span class="queue-number">${index + 1}</span>
@@ -868,6 +935,8 @@
                 // 全曲再生完了
                 isPlayingQueue = false;
                 document.getElementById('next-btn').style.display = 'none';
+                queue = [];
+                updateQueueDisplay();
                 goBack();
                 alert('予約リストの全曲を再生しました！');
                 return;
