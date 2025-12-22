@@ -269,6 +269,15 @@
             margin-bottom: 15px;
         }
 
+        /* 歌手名の色分け：男性=水色、女性=ピンク、混合=白 */
+        .artist-male {
+            color: #7DD3FC;
+        }
+
+        .artist-female {
+            color: #FDA4AF;
+        }
+
         .song-category {
             display: inline-block;
             padding: 6px 12px;
@@ -779,6 +788,53 @@
             {id: 200, title: 'マツケンサンバⅡ', artist: '松平健', category: '昭和歌謡', youtubeId: 'YwCgA2j-QZQ'}
         ];
 
+        // 女性歌手リスト
+        const femaleArtists = [
+            '石川さゆり', 'テレサ・テン', '八代亜紀', '美空ひばり', '坂本冬美', '都はるみ',
+            '大月みやこ', '夏川りみ', '松村和子', '森昌子', '川中美幸', '山本リンダ',
+            'ジュディ・オング', '欧陽菲菲', '藤圭子', '西田佐知子', '新谷のり子', '小坂明子',
+            '由紀さおり', '山口百恵', '中森明菜', '研ナオコ', '黛ジュン', 'イルカ',
+            '川田正子', '一青窈', '秋元順子', '香西かおり', '北見恭子', '水森かおり',
+            '門倉有希', '笠置シヅ子', 'ペギー葉山', 'いしだあゆみ', '島倉千代子',
+            '倍賞千恵子', '中島みゆき', '並木路子', '菅原都々子', '高峰秀子', '荻野目洋子',
+            '堺ひろみ', '中山美穂'
+        ];
+
+        // 男性歌手リスト
+        const maleArtists = [
+            '千昌夫', '細川たかし', '吉幾三', '北島三郎', '氷川きよし', '五木ひろし',
+            '鳥羽一郎', '村田英雄', '森進一', '大川栄策', '美川憲一', '渡哲也',
+            '春日八郎', 'さだまさし', '村下孝蔵', '子門真人', '坂本九', '井上陽水',
+            '舟木一夫', '秋川雅史', '佳山明生', '渥美二郎', '藤山一郎', '岡本敦郎',
+            '河島英五', '尾崎紀世彦', '堺正章', 'すぎもとまさと', '山川豊', '竜鉄也',
+            '三橋美智也', '石原裕次郎', '谷村新司', '西田敏行', '高山厳', '西郷輝彦',
+            '郷ひろみ', '錦野旦', '布施明', '尾崎豊', '松山千春', '松平健',
+            'フランク永井', '成世昌平', '岡晴夫', '三波春夫', '財津和夫'
+        ];
+
+        // 歌手の性別を判定（male/female/mixed）
+        function getArtistGender(artist) {
+            // 「・」「＆」「と」で分割されている場合は混合とみなす
+            if (artist.includes('・') || artist.includes('＆') || artist.includes('と')) {
+                return 'mixed';
+            }
+            if (femaleArtists.some(name => artist.includes(name))) {
+                return 'female';
+            }
+            if (maleArtists.some(name => artist.includes(name))) {
+                return 'male';
+            }
+            return 'mixed'; // 不明な場合は混合扱い
+        }
+
+        // 性別に応じたクラス名を返す
+        function getArtistClass(artist) {
+            const gender = getArtistGender(artist);
+            if (gender === 'male') return 'artist-male';
+            if (gender === 'female') return 'artist-female';
+            return ''; // 混合は白（デフォルト）
+        }
+
         // 初期化
         function init() {
             renderSongList(songs);
@@ -813,7 +869,7 @@
                         <div class="song-number">No.${song.id}</div>
                         <div class="song-category">${song.category}</div>
                         <div class="song-title">${song.title}</div>
-                        <div class="song-artist">${song.artist}</div>
+                        <div class="song-artist ${getArtistClass(song.artist)}">${song.artist}</div>
                         <div class="song-buttons">
                             <button class="play-now-btn" onclick="playSong(${song.id})">▶ 今すぐ再生</button>
                             <button class="add-to-queue-btn ${inQueue ? 'in-queue' : ''}" onclick="toggleQueue(${song.id})">
